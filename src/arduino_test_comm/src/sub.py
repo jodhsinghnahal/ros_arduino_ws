@@ -4,34 +4,38 @@
 import rospy
 import cv2
 from std_msgs.msg import Int16
+from sensor_msgs.msg import Image
+from cv_bridge import CvBridge
 
+state = False
 
 def potentiometer_callback(msg):
-    if msg.data > 50:
-        cam = cv2.VideoCapture(0)
+    global state
 
-        # Capture a single frame
-        check, frame = cam.read()
-
-        # Display the captured frame
-        cv2.imshow('video', frame)
-        cv2.waitKey(0)  # Wait for a key press
-
-        # Release the video capture resources
-        cam.release()
-        cv2.destroyAllWindows()
+    rospy.set_param('usb_cam/framerate', msg.data)
+    print(rospy.get_param('usb_cam/framerate'))
 
     rospy.loginfo("Received Potentiometer State: %d", msg.data)
+    if msg.data > 0:
+        state = True
+    else:
+        state = False
+
+def cam1_callback(msg):
+    if state:
+        bridge = CvBridge()
+        frame = bridge.imgmsg_to_cv2(msg, desired_encoding="bgr8")
+        frame = cv2.flip(frame, 1)
+        cv2.imshow('Webcam Feed', frame)
+        cv2.waitKey(1) 
+    else:
+        cv2.destroyAllWindows()
 
 def potentiometer_subscriber():
     rospy.init_node('potentiometer_subscriber', anonymous=True)
 
-    # Define the topic to subscribe to and the message type
-    topic_name = 'potentiometer_state'
-    msg_type = Int16
-
-    # Create a subscriber
-    rospy.Subscriber(topic_name, msg_type, potentiometer_callback)
+    rospy.Subscriber('potentiometer_state', Int16, potentiometer_callback)
+    rospy.Subscriber('/usb_cam/image_raw', Image, cam1_callback)
 
     rospy.loginfo("Potentiometer Subscriber Node is running.")
     rospy.spin()
