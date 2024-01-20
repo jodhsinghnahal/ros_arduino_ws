@@ -1,0 +1,8 @@
+prefix=/home/jodh/ros_arduino_ws/devel
+
+Name: arduino_test_comm
+Description: Description of arduino_test_comm
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

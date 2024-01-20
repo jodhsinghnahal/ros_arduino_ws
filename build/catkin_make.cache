@@ -1,0 +1,2 @@
+arduino_test_comm
+-DCATKIN_DEVEL_PREFIX=/home/jodh/ros_arduino_ws/devel -DCMAKE_INSTALL_PREFIX=/home/jodh/ros_arduino_ws/install -G Unix Makefiles
